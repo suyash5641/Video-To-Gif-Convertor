@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+const baseURL = process.env.NEXT_PUBLIC_FFMPEG_URL;
 const ffmpeg = new FFmpeg();
 
 interface GenerateUIProps {
@@ -29,10 +30,12 @@ const GenerateGif = ({ video, videoRange }: GenerateUIProps) => {
 
   const generateGif = useCallback(async () => {
     setIsLoading(true);
-
     try {
       if (!ffmpeg.loaded) {
-        await ffmpeg.load();
+        await ffmpeg.load({
+          coreURL: `${baseURL}/ffmpeg-core.js`,
+          wasmURL: `${baseURL}/ffmpeg-core.wasm`,
+        });
       }
 
       const startTime = videoRange[0];
