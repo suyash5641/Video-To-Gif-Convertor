@@ -4,13 +4,7 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+// import { useGenerateGif } from "./useGenerateGif";
 
 const baseURL = process.env.NEXT_PUBLIC_FFMPEG_URL;
 const ffmpeg = new FFmpeg();
@@ -18,18 +12,20 @@ const ffmpeg = new FFmpeg();
 interface GenerateUIProps {
   video: File;
   videoRange: number[];
+  handleGifChange: (url: string) => void;
 }
 
-const GenerateGif = ({ video, videoRange }: GenerateUIProps) => {
-  const [gifUrl, setGifUrl] = useState<string | null>(null);
-
-  const [loading, setIsLoading] = useState(false);
-  const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const GenerateGif = ({
+  video,
+  videoRange,
+  handleGifChange,
+}: GenerateUIProps) => {
   const { toast } = useToast();
+  // const { setIsGifGenerating, lsGifGenerating, setGifUrl } = useGenerateGif();
+  const [lsGifGenerating, setIsGifGenerating] = useState(false);
 
   const generateGif = useCallback(async () => {
-    setIsLoading(true);
+    setIsGifGenerating(true);
     try {
       if (!ffmpeg.loaded) {
         await ffmpeg.load({
@@ -53,37 +49,21 @@ const GenerateGif = ({ video, videoRange }: GenerateUIProps) => {
         `${duration}`,
         "-vf",
         "fps=10,scale=320:-1:flags=lanczos",
-        "output.mp4",
-      ]);
-
-      // Generate the GIF for download
-      await ffmpeg.exec([
-        "-i",
-        "input.mp4",
-        "-ss",
-        `${startTime}`,
-        "-t",
-        `${duration}`,
-        "-vf",
-        "fps=10,scale=320:-1:flags=lanczos",
+        "-preset",
+        "ultrafast",
         "output.gif",
       ]);
 
-      const videoData = await ffmpeg.readFile("output.mp4");
       const gifData = await ffmpeg.readFile("output.gif");
-      const videoBlob = new Blob([videoData], { type: "video/mp4" });
-      const videoUrl = URL.createObjectURL(videoBlob);
-      setVideoUrl(videoUrl);
+
       const gifBlob = new Blob([gifData], { type: "image/gif" });
       const gifUrl = URL.createObjectURL(gifBlob);
-      setGifUrl(gifUrl);
+      handleGifChange(gifUrl);
 
       toast({
         title: "GIF Generated",
         description: "Your GIF has been successfully created!",
       });
-
-      setIsModalOpen(true);
     } catch (error) {
       console.error("Error generating GIF:", error);
       toast({
@@ -92,53 +72,21 @@ const GenerateGif = ({ video, videoRange }: GenerateUIProps) => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsGifGenerating(false);
     }
-  }, [video, videoRange, toast]);
-
-  const closeModal = () => setIsModalOpen(false);
+  }, [videoRange, video, handleGifChange, toast]);
 
   return (
     <div className="space-y-4">
       <div className="flex justify-center">
         <Button
           onClick={generateGif}
-          disabled={loading}
+          disabled={lsGifGenerating}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
         >
-          {loading ? "Generating..." : "Generate GIF"}
+          {lsGifGenerating ? "Generating..." : "Generate GIF"}
         </Button>
       </div>
-
-      {/* Modal */}
-      {gifUrl && (
-        <Dialog open={isModalOpen} onOpenChange={closeModal}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>GIF Preview</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col items-center space-y-4">
-              {/* Video Preview */}
-              <video
-                src={videoUrl}
-                controls
-                className="w-full max-w-md border rounded"
-              />
-              {/* Download Button */}
-              <Button asChild variant="secondary">
-                <a href={gifUrl} download="output.gif">
-                  Download GIF
-                </a>
-              </Button>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={closeModal}>
-                Close
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };

@@ -7,13 +7,18 @@ import UploadVideo from "./UploadVideo";
 import GenerateGif from "./GenerateGif";
 import { fadeInUp } from "@/app/utils/animation";
 import { motion } from "framer-motion";
-// import { DummyTimeline } from "./DummyTimeline";
+import { Button } from "./ui/button";
+import { Navbar } from "./Navbar";
 
 export default function VideoToGifConverter() {
   const [video, setVideo] = useState<File | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoRange, setVideoRange] = useState<number[]>([0, 0]);
+  const [gifUrl, setGifUrl] = useState<string | null>(null);
 
+  const handleGifChange = (url: string) => {
+    setGifUrl(url);
+  };
   const handleChangeVideoRange = (startRange: number, endRange: number) => {
     setVideoRange([startRange, endRange]);
   };
@@ -55,13 +60,7 @@ export default function VideoToGifConverter() {
           <span className="text-violet-600">Stunning GIFs</span>
         </motion.p>
       </motion.div>
-      {/* <motion.p
-        // className="text-xl md:text-2xl text-gray-600 font-light"
-        className="text-center text-sm sm:text-base md:text-2xl text-gray-600 font-light"
-        variants={fadeInUp}
-      >
-        Video to GIF Converter
-      </motion.p> */}
+
       <Card className="max-w-4xl mx-auto p-2 sm:p-4 w-full xs:w-[100%] sm:w-[80%] md:w-[50%]">
         <div className="grid gap-8">
           <div
@@ -90,19 +89,13 @@ export default function VideoToGifConverter() {
           {video && (
             <div className="flex flex-row justify-center gap-4">
               <UploadVideo onVideoSelect={handleVideoUpload} buttonText="" />
-              <GenerateGif video={video} videoRange={videoRange} />
+              <GenerateGif
+                video={video}
+                videoRange={videoRange}
+                handleGifChange={handleGifChange}
+              />
             </div>
           )}
-
-          {/* {video && (
-            <VideoTimeline
-              video={video}
-              onTimeChange={handleTimeChange}
-              handleChangeVideoRange={handleChangeVideoRange}
-              videoRange={videoRange}
-            />
-          )}
-          {video && <GenerateGif video={video} videoRange={videoRange} />} */}
         </div>
       </Card>
       {video && (
@@ -113,7 +106,25 @@ export default function VideoToGifConverter() {
           videoRange={videoRange}
         />
       )}
-      {/* {video && <GenerateGif video={video} videoRange={videoRange} />} */}
+      <div>
+        {gifUrl && (
+          <>
+            <img
+              src={gifUrl}
+              alt="GIF Preview"
+              className="w-full max-w-xs rounded-lg shadow-md"
+            />
+            {/* Download Button */}
+            <Button asChild variant="secondary">
+              <a href={gifUrl} download="output.gif">
+                Download GIF
+              </a>
+            </Button>
+          </>
+        )}
+      </div>
+
+      <Navbar />
     </div>
   );
 }
