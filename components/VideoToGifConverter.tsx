@@ -1,54 +1,52 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { VideoTimeline } from "./VideoTimeline";
 import UploadVideo from "./UploadVideo";
 import GenerateGif from "./GenerateGif";
-import { fadeInUp } from "@/app/utils/animation";
-import { motion } from "framer-motion";
-import { Button } from "./ui/button";
+
 import { Navbar } from "./Navbar";
+import { RootState } from "@/app/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setVideoState } from "@/app/slice/videoSlice";
 
 export default function VideoToGifConverter() {
-  const [video, setVideo] = useState<File | null>(null);
+  // const [video, setVideo] = useState<File | null>(null);
+  const videoState = useSelector((state: RootState) => state.video);
+  const video = videoState?.file;
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoRange, setVideoRange] = useState<number[]>([0, 0]);
-  const [gifUrl, setGifUrl] = useState<string | null>(null);
+  // const videoRange = videoState?.range;
+  // const [videoRange, setVideoRange] = useState<number[]>([0, 0]);
+  // const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const dispatch = useDispatch();
 
-  const handleGifChange = (url: string) => {
-    setGifUrl(url);
-  };
-  const handleChangeVideoRange = (startRange: number, endRange: number) => {
-    setVideoRange([startRange, endRange]);
-  };
+  // const handleGifChange = (url: string) => {
+  //   setGifUrl(url);
+  // };
 
   const handleVideoUpload = (file: File) => {
     if (file) {
-      setVideo(file);
+      dispatch(setVideoState({ file: file }));
       if (videoRef.current) {
         videoRef.current.src = URL.createObjectURL(file);
       }
     }
   };
 
-  const handleTimeChange = (
-    start: number,
-    end: number,
-    slider: "left" | "right"
-  ) => {
+  const currentTime = useSelector(
+    (state: RootState) => state.video.currentTime
+  );
+
+  useEffect(() => {
     if (videoRef.current) {
-      if (slider === "left") {
-        videoRef.current.currentTime = start;
-      } else if (slider === "right") {
-        videoRef.current.currentTime = end;
-      }
+      videoRef.current.currentTime = currentTime;
     }
-  };
+  }, [currentTime]);
 
   return (
-    <div className="min-h-screen bg-lightbluecustom p-4 md:p-8 flex flex-col justify-center items-center gap-6">
-      <motion.div
+    <div className="min-h-screen bg-lightbluecustom p-4 px-0 md:p-8 md:px-0 flex flex-col justify-center items-center gap-6">
+      {/* <motion.div
         className="max-w-3xl mx-auto text-center space-y-8"
         variants={fadeInUp}
       >
@@ -59,7 +57,7 @@ export default function VideoToGifConverter() {
           Transform Your Videos into{" "}
           <span className="text-violet-600">Stunning GIFs</span>
         </motion.p>
-      </motion.div>
+      </motion.div> */}
 
       <Card className="max-w-4xl mx-auto p-2 sm:p-4 w-full xs:w-[100%] sm:w-[80%] md:w-[50%]">
         <div className="grid gap-8">
@@ -88,41 +86,12 @@ export default function VideoToGifConverter() {
 
           {video && (
             <div className="flex flex-row justify-center gap-4">
-              <UploadVideo onVideoSelect={handleVideoUpload} buttonText="" />
-              <GenerateGif
-                video={video}
-                videoRange={videoRange}
-                handleGifChange={handleGifChange}
-              />
+              <GenerateGif />
             </div>
           )}
         </div>
       </Card>
-      {video && (
-        <VideoTimeline
-          video={video}
-          onTimeChange={handleTimeChange}
-          handleChangeVideoRange={handleChangeVideoRange}
-          videoRange={videoRange}
-        />
-      )}
-      <div>
-        {gifUrl && (
-          <>
-            <img
-              src={gifUrl}
-              alt="GIF Preview"
-              className="w-full max-w-xs rounded-lg shadow-md"
-            />
-            {/* Download Button */}
-            <Button asChild variant="secondary">
-              <a href={gifUrl} download="output.gif">
-                Download GIF
-              </a>
-            </Button>
-          </>
-        )}
-      </div>
+      {video && <VideoTimeline />}
 
       <Navbar />
     </div>

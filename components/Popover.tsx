@@ -11,6 +11,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/app/store";
+import { setVideoState } from "@/app/slice/videoSlice";
+import Image from "next/image";
 
 const speedOptions = ["0.5x", "1x", "1.5x", "2x"];
 const frameOptions = [
@@ -20,8 +24,12 @@ const frameOptions = [
 ];
 
 export function PopOver() {
-  const [speed, setSpeed] = React.useState("1x");
-  const [frameRate, setFrameRate] = React.useState<number | null>(null);
+  const videoState = useSelector((state: RootState) => state?.video);
+  const gifState = useSelector((state: RootState) => state?.gif);
+  const speed = videoState.speed;
+  const frameRate = videoState.frameRate;
+  const gifUrl = gifState.gifUrl;
+  const dispatch = useDispatch();
 
   return (
     <>
@@ -44,7 +52,7 @@ export function PopOver() {
               <Button
                 key={option}
                 variant={speed === option ? "default" : "ghost"}
-                onClick={() => setSpeed(option)}
+                onClick={() => dispatch(setVideoState({ speed: option }))}
                 className={cn(
                   "transition-all",
                   speed === option &&
@@ -78,7 +86,9 @@ export function PopOver() {
                 <Button
                   key={option.rate}
                   variant={frameRate === option.rate ? "default" : "ghost"}
-                  onClick={() => setFrameRate(option.rate)}
+                  onClick={() =>
+                    dispatch(setVideoState({ frameRate: option?.rate }))
+                  }
                   className={cn(
                     "justify-start transition-all",
                     frameRate === option.rate &&
@@ -104,6 +114,45 @@ export function PopOver() {
         <Upload className="h-4 w-4" />
         <span className="sr-only">Re-upload</span>
       </Button>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="w-8 h-8 rounded-full transition-all hover:bg-primary hover:text-primary-foreground"
+          >
+            <Gauge className="h-4 w-4" />
+            <span className="sr-only">Preview Gif</span>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent side={"right"} className="w-[100%] mr-4">
+          <div className="grid gap-2">
+            <h3 className="font-medium text-sm">Preview Gif</h3>
+            <Separator />
+            <div>
+              {gifUrl && (
+                <>
+                  <div>
+                    <Image
+                      src={gifUrl}
+                      alt="GIF Preview"
+                      className="max-w-xs rounded-lg shadow-md"
+                      width={100}
+                      height={100}
+                    />
+                    {/* Download Button */}
+                  </div>
+                  <Button asChild variant="secondary">
+                    <a href={gifUrl} download="output.gif">
+                      Download GIF
+                    </a>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
     </>
   );
 }
