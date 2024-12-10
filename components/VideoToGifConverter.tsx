@@ -2,11 +2,11 @@
 
 import { useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { VideoTimeline } from "./VideoTimeline";
+// import { VideoTimeline } from "./VideoTimeline";
 import UploadVideo from "./UploadVideo";
-import GenerateGif from "./GenerateGif";
+// import GenerateGif from "./GenerateGif";
 
-import { Navbar } from "./Navbar";
+// import { Navbar } from "./Navbar";
 import { RootState } from "@/app/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideoState } from "@/app/slice/videoSlice";
@@ -45,21 +45,14 @@ export default function VideoToGifConverter() {
   }, [currentTime]);
 
   return (
-    <div className="min-h-screen bg-lightbluecustom p-4 px-0 md:p-8 md:px-0 flex flex-col justify-center items-center gap-6">
-      {/* <motion.div
-        className="max-w-3xl mx-auto text-center space-y-8"
-        variants={fadeInUp}
+    <div className="min-h-[calc(100vh_-_150px)] bg-lightbluecustom p-4 px-0 md:p-8 md:px-0 flex flex-col justify-center items-center gap-6 ">
+      <Card
+        className={
+          video
+            ? "max-w-4xl mx-auto p-2 sm:p-4 w-[82%] xs:w-[75%] sm:w-[60%] md:w-[50%] border-0"
+            : "max-w-4xl mx-auto p-2 sm:p-4 w-[82%] xs:w-[75%] sm:w-[45%] md:w-[40%]"
+        }
       >
-        <motion.p
-          className="text-2xl md:text-4xl font-extrabold text-gray-800 tracking-tight leading-tight"
-          variants={fadeInUp}
-        >
-          Transform Your Videos into{" "}
-          <span className="text-violet-600">Stunning GIFs</span>
-        </motion.p>
-      </motion.div> */}
-
-      <Card className="max-w-4xl mx-auto p-2 sm:p-4 w-full xs:w-[100%] sm:w-[80%] md:w-[50%]">
         <div className="grid gap-8">
           <div
             className={
@@ -84,16 +77,14 @@ export default function VideoToGifConverter() {
             )}
           </div>
 
-          {video && (
+          {/* {video && (
             <div className="flex flex-row justify-center gap-4">
               <GenerateGif />
             </div>
-          )}
+          )} */}
         </div>
       </Card>
-      {video && <VideoTimeline />}
-
-      <Navbar />
+      {/* {video && <VideoTimeline />} */}
     </div>
   );
 }

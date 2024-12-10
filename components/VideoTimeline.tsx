@@ -2,22 +2,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
 import { CustomSlider } from "./ui/customslider";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/app/store";
 import { setVideoState } from "@/app/slice/videoSlice";
-
-// interface VideoTimelineProps {
-//   video: File;
-//   onTimeChange: (
-//     startTime: number,
-//     endTime: number,
-//     slider: "left" | "right"
-//   ) => void;
-//   handleChangeVideoRange: (startRange: number, endRange: number) => void;
-//   videoRange: number[];
-// }
 
 export function VideoTimeline() {
   const [frames, setFrames] = useState<string[]>([]);
@@ -124,13 +112,11 @@ export function VideoTimeline() {
   }, [video]);
 
   return (
-    <div className="bg-gray-900/95 w-full space-y-4 flex items-center justify-start">
+    <div className="fixed bottom-[40px]  z-10  border-t md:relative md:bottom-auto bg-customdarkbackground w-full space-y-4 flex items-center justify-start">
       {loading || !frames.length ? (
-        <div className="w-full space-y-4 flex items-center justify-center">
-          <Loader2 className="animate-spin text-white" size={32} />
-        </div>
+        <div className="w-full space-y-4 flex items-center justify-center" />
       ) : (
-        <div className="relative  space-y-4  rounded-lg p-4 overflow-scroll">
+        <div className="relative  space-y-4  rounded-lg p-4 overflow-scroll py-[34px]">
           <div className="relative pl-[10px] w-[1040px]">
             <div className="flex gap-1  mx-2 ml-0">
               <div className="flex gap-1 transition-transform duration-200 ">
@@ -162,7 +148,7 @@ export function VideoTimeline() {
               <div className="flex justify-between text-xs text-gray-400 mb-2">
                 <CustomSlider
                   value={value}
-                  max={videoRange[1]}
+                  max={duration}
                   step={0.01}
                   onValueChange={handleChange}
                   className="absolute left-2 right-0 top-0 z-20"

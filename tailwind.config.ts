@@ -13,6 +13,7 @@ const config: Config = {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         lightbluecustom: "var(--light-blue-custom)",
+        customdarkbackground: "var(--dark-background)",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

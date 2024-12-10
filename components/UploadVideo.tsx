@@ -28,7 +28,7 @@ const UploadVideo: React.FC<VideoUploadProps> = ({
       />
       <label htmlFor="video-upload">
         <Button variant="outline" className="w-full max-w-sm" asChild>
-          <span className="p-2 p-2 px-2 pl-2 pr-2 flex flex-wrap h-full text-[12px] ">
+          <span className="p-2 p-2 px-2 pl-2 pr-2 flex flex-wrap h-full text-[12px] bg-[#202020] ">
             <Upload className="w-4 h-4 mr-2" />
             {buttonText}
           </span>
