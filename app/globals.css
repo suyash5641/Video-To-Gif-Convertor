@@ -40,6 +40,7 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
     --light-blue-custom: #e2e1ff;
+    --seeker-background: #0083e2;
   }
   .dark {
     --background: 0, 0%, 6%;
@@ -68,6 +69,7 @@ body {
     --chart-5: 340 75% 55%;
     --dark-background: #101010;
     --light-blue-custom: #0e0e0e;
+    --seeker-background: #0083e2;
   }
 }
 

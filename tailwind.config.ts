@@ -14,6 +14,7 @@ const config: Config = {
         foreground: "hsl(var(--foreground))",
         lightbluecustom: "var(--light-blue-custom)",
         customdarkbackground: "var(--dark-background)",
+        seekerbackground: "var(--seeker-background)",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

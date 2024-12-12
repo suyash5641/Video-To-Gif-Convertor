@@ -12,8 +12,8 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/app/store";
-import { setVideoState } from "@/app/slice/videoSlice";
+import { RootState } from "@/lib/store";
+import { setVideoState } from "@/lib/slice/videoSlice";
 import Image from "next/image";
 
 const speedOptions = ["0.5x", "1x", "1.5x", "2x"];

@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Upload, Wand2, CloudDownload } from "lucide-react";
 import { StepCard } from "./Card";
-import { fadeInUp, staggerChildren } from "@/app/utils/animation";
+import { fadeInUp, staggerChildren } from "@/lib/animation";
 
 const steps = [
   {

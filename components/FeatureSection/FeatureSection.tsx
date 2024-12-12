@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { Zap, Crown, Smile, Shield } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
-import { fadeInUp, staggerChildren } from "@/app/utils/animation";
+import { fadeInUp, staggerChildren } from "@/lib/animation";
 
 const features = [
   {

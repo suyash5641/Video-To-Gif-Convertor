@@ -1,13 +1,6 @@
 "use client";
 
-// export function Timeline() {
-//   return (
-//     <div className="fixed bottom-[40px]  border-t md:relative md:bottom-auto md:h-[113px]  w-full space-y-4 flex items-center justify-start h-[60px]">
-//       <div className="w-[40%]  h-[55px] ml-14 bg-[#404040] border-2 border-white rounded-md" />
-//     </div>
-//   );
-// }
-export function Timeline() {
+const Timeline = () => {
   return (
     <div className="fixed bottom-[50px] md:relative md:bottom-auto w-full h-[60px] md:h-[113px] bg-gradient-to-b from-transparent to-gray-900/10 backdrop-blur-sm border-t border-gray-200/10">
       <div className="relative h-full max-w-[1200px] mx-auto px-4 flex items-center">
@@ -41,4 +34,5 @@ export function Timeline() {
       </div>
     </div>
   );
-}
+};
+export default Timeline;

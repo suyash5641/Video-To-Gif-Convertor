@@ -4,9 +4,11 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile } from "@ffmpeg/util";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { RootState } from "@/app/store";
+import { RootState } from "@/lib/store";
 import { useSelector, useDispatch } from "react-redux";
-import { setGifState } from "@/app/slice/gifSlice";
+import { setGifState } from "@/lib/slice/gifSlice";
+import { Skeleton } from "./ui/skeleton";
+import Image from "next/image";
 
 const baseURL = process.env.NEXT_PUBLIC_FFMPEG_URL;
 const ffmpeg = new FFmpeg();
@@ -20,6 +22,7 @@ const GenerateGif = () => {
   const videoRange = videoState?.range;
   const video = videoState?.file;
   const isGifGenerating = gifState?.isGifGenerating;
+  const gifUrl = gifState?.gifUrl;
   const { toast } = useToast();
 
   const generateGif = useCallback(async () => {
@@ -58,7 +61,6 @@ const GenerateGif = () => {
       const gifBlob = new Blob([gifData], { type: "image/gif" });
       const gifUrl = URL.createObjectURL(gifBlob);
       dispatch(setGifState({ gifUrl }));
-      console.log(gifUrl);
 
       toast({
         title: "GIF Generated",
@@ -76,17 +78,49 @@ const GenerateGif = () => {
     }
   }, [video, dispatch, videoRange, toast]);
 
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-center">
-        <Button
-          onClick={generateGif}
-          disabled={isGifGenerating}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-        >
-          {isGifGenerating ? "Generating..." : "Generate GIF"}
-        </Button>
+  const showGifPreview = () => {
+    if (isGifGenerating) {
+      return <Skeleton className="h-[125px] w-full rounded-xl" />;
+    }
+    if (gifUrl) {
+      return (
+        <div className="h-full w-full gap-2 rounded-xl flex flex-col">
+          <div>
+            <Image
+              src={gifUrl}
+              alt="GIF Preview"
+              className="max-w-xs rounded-lg shadow-md"
+              width={200}
+              height={100}
+            />
+            {/* Download Button */}
+          </div>
+          <Button asChild variant="secondary">
+            <a href={gifUrl} download="output.gif">
+              Download GIF
+            </a>
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-[125px] w-full rounded-xl flex flex-col items-center justify-center">
+        <p>{!video ? "Upload video first" : "Generate Gif to preview"}</p>
       </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col justify-center items-center w-full gap-4">
+      {showGifPreview()}
+      <Button
+        onClick={generateGif}
+        disabled={isGifGenerating || !video}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+      >
+        {isGifGenerating ? "Generating..." : "Generate GIF"}
+      </Button>
     </div>
   );
 };

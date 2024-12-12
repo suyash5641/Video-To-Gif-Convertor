@@ -4,10 +4,10 @@ import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
 import { CustomSlider } from "./ui/customslider";
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/app/store";
-import { setVideoState } from "@/app/slice/videoSlice";
+import { RootState } from "@/lib/store";
+import { setVideoState } from "@/lib/slice/videoSlice";
 
-export function VideoTimeline() {
+const VideoTimeline = () => {
   const [frames, setFrames] = useState<string[]>([]);
   const videoState = useSelector((state: RootState) => state.video);
   const dispatch = useDispatch();
@@ -33,11 +33,11 @@ export function VideoTimeline() {
 
       const canvas = document.createElement("canvas");
       const context = canvas.getContext("2d");
-      const frameCount = 10;
+      const frameCount = 18;
       const frameUrls: string[] = [];
 
-      canvas.width = 160;
-      canvas.height = 90;
+      canvas.width = 52;
+      canvas.height = 50;
 
       for (let i = 0; i < frameCount; i++) {
         const time = (duration / frameCount) * i;
@@ -117,7 +117,7 @@ export function VideoTimeline() {
         <div className="w-full space-y-4 flex items-center justify-center" />
       ) : (
         <div className="relative  space-y-4  rounded-lg p-4 overflow-scroll py-[34px]">
-          <div className="relative pl-[10px] w-[1040px]">
+          <div className="relative pl-[10px] w-[1013px]">
             <div className="flex gap-1  mx-2 ml-0">
               <div className="flex gap-1 transition-transform duration-200 ">
                 {frames.map((frame, index) => (
@@ -133,7 +133,7 @@ export function VideoTimeline() {
                     <Image
                       src={frame}
                       alt={`Frame ${index + 1}`}
-                      width={100}
+                      width={52}
                       height={50}
                       className="rounded-sm object-cover"
                     />
@@ -142,8 +142,8 @@ export function VideoTimeline() {
               </div>
             </div>
 
-            <div className="absolute w-full top-[28px] right-0 px-2">
-              {/* Adjusted position of the slider */}
+            {/* <div className="absolute w-full top-[28px] right-0 px-2">
+              
 
               <div className="flex justify-between text-xs text-gray-400 mb-2">
                 <CustomSlider
@@ -154,10 +154,33 @@ export function VideoTimeline() {
                   className="absolute left-2 right-0 top-0 z-20"
                 />
               </div>
+            </div> */}
+            <div className="absolute w-[1013px] top-[20px] right-0 px-2">
+              <div className="flex justify-between text-xs text-gray-400 mb-2">
+                <CustomSlider
+                  value={value}
+                  max={duration}
+                  step={0.01}
+                  onValueChange={handleChange}
+                  className="absolute left-2 right-0 top-0 z-20"
+                />
+              </div>
+            </div>
+            <div className="absolute w-[1016px] top-[24px] right-0 px-2">
+              <div className="flex justify-between text-xs text-gray-400 mb-2">
+                <Slider
+                  value={videoRange}
+                  max={duration}
+                  step={0.01}
+                  minStepsBetweenThumbs={40}
+                  onValueChange={handleRangeChange}
+                  className="absolute left-2 right-2 top-0 z-40"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="relative px-2 mt-2 w-[1050px]">
+          {/* <div className="absolute w-full top-[40px] right-0 px-2">
             <div className="flex justify-between text-xs text-gray-400 mb-2">
               <Slider
                 value={videoRange}
@@ -165,12 +188,13 @@ export function VideoTimeline() {
                 step={0.01}
                 minStepsBetweenThumbs={40}
                 onValueChange={handleRangeChange}
-                className="absolute left-2 right-2 top-0 z-20"
+                className="absolute left-2 right-2 top-0 z-40"
               />
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>
   );
-}
+};
+export default VideoTimeline;

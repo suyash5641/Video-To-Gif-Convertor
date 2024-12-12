@@ -2,7 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
-import { fadeInUp } from "@/app/utils/animation";
+import { fadeInUp } from "@/lib/animation";
 
 const MainSection = () => {
   const handleNavigation = () => {

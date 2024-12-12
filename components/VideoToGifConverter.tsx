@@ -7,11 +7,11 @@ import UploadVideo from "./UploadVideo";
 // import GenerateGif from "./GenerateGif";
 
 // import { Navbar } from "./Navbar";
-import { RootState } from "@/app/store";
+import { RootState } from "@/lib/store";
 import { useDispatch, useSelector } from "react-redux";
-import { setVideoState } from "@/app/slice/videoSlice";
+import { setVideoState } from "@/lib/slice/videoSlice";
 
-export default function VideoToGifConverter() {
+const VideoToGifConverter = () => {
   // const [video, setVideo] = useState<File | null>(null);
   const videoState = useSelector((state: RootState) => state.video);
   const video = videoState?.file;
@@ -87,4 +87,5 @@ export default function VideoToGifConverter() {
       {/* {video && <VideoTimeline />} */}
     </div>
   );
-}
+};
+export default VideoToGifConverter;
