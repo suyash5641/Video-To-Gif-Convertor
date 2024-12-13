@@ -1,11 +1,16 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface FrameRateOption {
+  rate: number;
+  maxDuration: number;
+}
+
 interface VideoState {
   file: File | null;
   range: number[];
   duration: number;
   speed: string;
-  frameRate: number | null;
+  frameRate: FrameRateOption | null;
   currentTime: number;
 }
 
@@ -14,7 +19,7 @@ const initialState: VideoState = {
   range: [0, 0],
   duration: 0,
   speed: "1x",
-  frameRate: null,
+  frameRate: { rate: 33, maxDuration: 10 },
   currentTime: 0,
 };
 

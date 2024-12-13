@@ -13,7 +13,7 @@ export const GifSpeed = () => {
 
   return (
     <div className="flex flex-col justify-center">
-      <p className="text-base"> Speed</p>
+      <p className="text-xs"> Speed</p>
       <ToggleGroup
         type="single"
         defaultValue={gifSpeed}

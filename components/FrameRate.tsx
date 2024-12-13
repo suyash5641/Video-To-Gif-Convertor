@@ -19,9 +19,10 @@ const FrameRate = () => {
   const gifFrameRate = videoState?.frameRate;
 
   return (
-    <>
+    <div className="flex flex-col justify-center gap-4">
+      <p className="text-xs"> Frames</p>
       <Select
-        defaultValue={""}
+        defaultValue={JSON.stringify({ rate: 33, maxDuration: 10 })}
         value={JSON.stringify(gifFrameRate)}
         onValueChange={(value) =>
           dispatch(setVideoState({ frameRate: JSON.parse(value) }))
@@ -36,13 +37,13 @@ const FrameRate = () => {
 
             {data.frameOptions.map((frame) => (
               <SelectItem key={frame.rate} value={JSON.stringify(frame)}>
-                {frame.rate} FPS ({frame.maxDuration}s)
+                {frame.rate} (max {frame.maxDuration}s)
               </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
-    </>
+    </div>
   );
 };
 export default FrameRate;

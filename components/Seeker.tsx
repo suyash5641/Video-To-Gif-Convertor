@@ -1,8 +1,15 @@
-export const Seeker = () => {
+interface SeekerProps {
+  height?: string;
+  left?: string;
+}
+export const Seeker = ({
+  height = "h-[90%]",
+  left = "left-0",
+}: SeekerProps) => {
   return (
     <div
       id="seeker"
-      className="absolute z-10 flex flex-col h-4/5 items-center right-[-10px]"
+      className={`absolute z-10 flex flex-col items-center ${height} ${left}`}
     >
       <svg
         viewBox="0 0 10 13"

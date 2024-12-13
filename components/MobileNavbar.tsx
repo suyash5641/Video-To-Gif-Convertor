@@ -22,8 +22,12 @@ const MobileNavbar = () => {
 
   const MobileContent = () => (
     <div className="p-4 space-y-4">
-      {activeItem.title === "Speed" && <GifSpeed />}
-      {activeItem.title === "Frame" && <FrameRate />}
+      {activeItem.title === "Settings" && (
+        <div className="flex flex-col justify-center gap-8">
+          <GifSpeed />
+          <FrameRate />
+        </div>
+      )}
       {activeItem.title === "Preview Gif" && <GenerateGif />}
     </div>
   );

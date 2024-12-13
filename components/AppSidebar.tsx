@@ -70,8 +70,13 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               <SidebarTrigger className="-ml-1" icon={<ChevronRight />} />
             </div>
             <SidebarGroup className="px-4 flex flex-row">
-              {activeItem.title === "Speed" && <GifSpeed />}
-              {activeItem.title === "Frame" && <FrameRate />}
+              {activeItem.title === "Settings" && (
+                <div className="flex flex-col justify-center gap-8">
+                  <GifSpeed />
+                  <FrameRate />
+                </div>
+              )}
+
               {activeItem.title === "Preview Gif" && <GenerateGif />}
             </SidebarGroup>
           </SidebarContent>

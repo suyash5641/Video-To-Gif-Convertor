@@ -116,8 +116,8 @@ const VideoTimeline = () => {
       {loading || !frames.length ? (
         <div className="w-full space-y-4 flex items-center justify-center" />
       ) : (
-        <div className="relative  space-y-4  rounded-lg p-4 overflow-scroll py-[34px]">
-          <div className="relative pl-[10px] w-[1013px]">
+        <div className="relative  space-y-4  rounded-lg p-4 overflow-scroll py-[34px] md:h-[149px]">
+          <div className="relative pl-[28px] w-full">
             <div className="flex gap-1  mx-2 ml-0">
               <div className="flex gap-1 transition-transform duration-200 ">
                 {frames.map((frame, index) => (
@@ -141,32 +141,18 @@ const VideoTimeline = () => {
                 ))}
               </div>
             </div>
-
-            {/* <div className="absolute w-full top-[28px] right-0 px-2">
-              
-
+            <div className="absolute w-[1008px] top-[20px] left-4 px-2">
               <div className="flex justify-between text-xs text-gray-400 mb-2">
                 <CustomSlider
                   value={value}
                   max={duration}
                   step={0.01}
                   onValueChange={handleChange}
-                  className="absolute left-2 right-0 top-0 z-20"
-                />
-              </div>
-            </div> */}
-            <div className="absolute w-[1013px] top-[20px] right-0 px-2">
-              <div className="flex justify-between text-xs text-gray-400 mb-2">
-                <CustomSlider
-                  value={value}
-                  max={duration}
-                  step={0.01}
-                  onValueChange={handleChange}
-                  className="absolute left-2 right-0 top-0 z-20"
+                  className="absolute left-2 left-0 top-0 z-20"
                 />
               </div>
             </div>
-            <div className="absolute w-[1016px] top-[24px] right-0 px-2">
+            <div className="absolute w-[1012px] top-[24px] left-4 px-2">
               <div className="flex justify-between text-xs text-gray-400 mb-2">
                 <Slider
                   value={videoRange}
@@ -179,19 +165,6 @@ const VideoTimeline = () => {
               </div>
             </div>
           </div>
-
-          {/* <div className="absolute w-full top-[40px] right-0 px-2">
-            <div className="flex justify-between text-xs text-gray-400 mb-2">
-              <Slider
-                value={videoRange}
-                max={duration}
-                step={0.01}
-                minStepsBetweenThumbs={40}
-                onValueChange={handleRangeChange}
-                className="absolute left-2 right-2 top-0 z-40"
-              />
-            </div>
-          </div> */}
         </div>
       )}
     </div>

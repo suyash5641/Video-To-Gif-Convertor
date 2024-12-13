@@ -13,6 +13,37 @@ import Image from "next/image";
 const baseURL = process.env.NEXT_PUBLIC_FFMPEG_URL;
 const ffmpeg = new FFmpeg();
 
+type ConversionParams = {
+  speed?: number; // e.g., 0.5x, 1.5x, etc.
+  frameRate?: number; // Target frame rate
+  inputFile: string; // Input video file path
+  outputFile: string; // Output GIF file path
+  startTime?: number; // Start time for the GIF
+  duration?: number; // Duration of the GIF
+};
+
+const constructFFmpegCommand = ({
+  speed,
+  frameRate,
+  inputFile,
+  outputFile,
+  startTime,
+  duration,
+}: ConversionParams): string[] => {
+  const argsMap: Record<string, string[]> = {
+    input: ["-i", inputFile],
+    startTime: startTime ? ["-ss", String(startTime)] : [],
+    duration: duration ? ["-t", String(duration)] : [],
+    videoFilter: ["-vf", "fps=10,scale=320:-1:flags=lanczos"],
+    speed: speed ? ["-filter:v", `setpts=${1 / speed}*PTS`] : [],
+    frameRate: frameRate ? ["-r", String(frameRate)] : [],
+    preset: ["-preset", "ultrafast"],
+    output: [outputFile],
+  };
+
+  return Object.values(argsMap).flat();
+};
+
 const GenerateGif = () => {
   const videoState = useSelector((state: RootState) => state.video);
 
@@ -20,9 +51,11 @@ const GenerateGif = () => {
   const dispatch = useDispatch();
 
   const videoRange = videoState?.range;
+  const speed = videoState?.speed;
   const video = videoState?.file;
   const isGifGenerating = gifState?.isGifGenerating;
   const gifUrl = gifState?.gifUrl;
+  const frameRate = videoState?.frameRate?.rate;
   const { toast } = useToast();
 
   const generateGif = useCallback(async () => {
@@ -42,24 +75,43 @@ const GenerateGif = () => {
 
       await ffmpeg.writeFile("input.mp4", await fetchFile(video));
 
-      await ffmpeg.exec([
-        "-i",
-        "input.mp4",
-        "-ss",
-        `${startTime}`,
-        "-t",
-        `${duration}`,
-        "-vf",
-        "fps=10,scale=320:-1:flags=lanczos",
-        "-preset",
-        "ultrafast",
-        "output.gif",
-      ]);
+      const commandArgs = constructFFmpegCommand({
+        speed: Number(speed.split("x")[0]),
+        frameRate: 5,
+
+        inputFile: "input.mp4",
+        outputFile: "output.gif",
+        startTime: startTime,
+        duration: duration,
+      });
+
+      await ffmpeg.exec(commandArgs);
+      // console.log(commandArgs);
+
+      // await ffmpeg.exec([
+      //   "-i",
+      //   "input.mp4",
+      //   "-ss",
+      //   `${startTime}`,
+      //   "-t",
+      //   `${duration}`,
+      //   "-vf",
+      //   "fps=10,scale=320:-1:flags=lanczos",
+      //   "-preset",
+      //   "ultrafast",
+      //   "output.gif",
+      // ]);
 
       const gifData = await ffmpeg.readFile("output.gif");
 
       const gifBlob = new Blob([gifData], { type: "image/gif" });
       const gifUrl = URL.createObjectURL(gifBlob);
+      const gifSizeInBytes = gifBlob.size;
+
+      // Convert size to KB or MB for readability
+
+      const gifSizeInMB = (gifSizeInBytes / (1024 * 1024)).toFixed(2); // MB
+      console.log(gifSizeInMB, "size");
       dispatch(setGifState({ gifUrl }));
 
       toast({
@@ -84,7 +136,7 @@ const GenerateGif = () => {
     }
     if (gifUrl) {
       return (
-        <div className="h-full w-full gap-2 rounded-xl flex flex-col">
+        <div className="h-full w-full gap-2 rounded-xl flex flex-col items-center">
           <div>
             <Image
               src={gifUrl}
@@ -105,8 +157,10 @@ const GenerateGif = () => {
     }
 
     return (
-      <div className="h-[125px] w-full rounded-xl flex flex-col items-center justify-center">
-        <p>{!video ? "Upload video first" : "Generate Gif to preview"}</p>
+      <div className="h-[125px] border bg-card w-full rounded-xl flex flex-col items-center justify-center">
+        <p className="text-sm">
+          {!video ? "Upload video first" : "Generate Gif to preview"}
+        </p>
       </div>
     );
   };
@@ -117,7 +171,7 @@ const GenerateGif = () => {
       <Button
         onClick={generateGif}
         disabled={isGifGenerating || !video}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
+        className="hover:bg-blue-500/90 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
       >
         {isGifGenerating ? "Generating..." : "Generate GIF"}
       </Button>
