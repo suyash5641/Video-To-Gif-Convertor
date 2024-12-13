@@ -1,5 +1,4 @@
 "use client";
-import Image from "next/image";
 import { Seeker } from "./Seeker";
 
 const DummyTimeline = () => {

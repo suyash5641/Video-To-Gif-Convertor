@@ -55,7 +55,7 @@ const GenerateGif = () => {
   const video = videoState?.file;
   const isGifGenerating = gifState?.isGifGenerating;
   const gifUrl = gifState?.gifUrl;
-  const frameRate = videoState?.frameRate?.rate;
+
   const { toast } = useToast();
 
   const generateGif = useCallback(async () => {
@@ -128,7 +128,7 @@ const GenerateGif = () => {
     } finally {
       dispatch(setGifState({ isGifGenerating: false }));
     }
-  }, [video, dispatch, videoRange, toast]);
+  }, [video, dispatch, videoRange, speed, toast]);
 
   const showGifPreview = () => {
     if (isGifGenerating) {
