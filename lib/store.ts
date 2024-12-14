@@ -8,10 +8,6 @@ export const store = () => {
       gif: gifslice,
       video: videoslice,
     },
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: false,
-      }),
   });
 };
 

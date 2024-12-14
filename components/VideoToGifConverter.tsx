@@ -10,6 +10,7 @@ import UploadVideo from "./UploadVideo";
 import { RootState } from "@/lib/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideoState } from "@/lib/slice/videoSlice";
+import { convertFileToBase64 } from "@/lib/base64";
 
 const VideoToGifConverter = () => {
   // const [video, setVideo] = useState<File | null>(null);
@@ -25,9 +26,10 @@ const VideoToGifConverter = () => {
   //   setGifUrl(url);
   // };
 
-  const handleVideoUpload = (file: File) => {
+  const handleVideoUpload = async (file: File) => {
     if (file) {
-      dispatch(setVideoState({ file: file }));
+      const base64 = await convertFileToBase64(file);
+      dispatch(setVideoState({ file: base64 }));
       if (videoRef.current) {
         videoRef.current.src = URL.createObjectURL(file);
       }
@@ -67,7 +69,7 @@ const VideoToGifConverter = () => {
                 className="w-full h-full object-contain"
                 controls
               >
-                <source src={URL.createObjectURL(video)} type={video.type} />
+                <source src={video} />
               </video>
             ) : (
               <UploadVideo

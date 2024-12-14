@@ -6,7 +6,7 @@ interface FrameRateOption {
 }
 
 interface VideoState {
-  file: File | null;
+  file: string | null;
   range: number[];
   duration: number;
   speed: string;

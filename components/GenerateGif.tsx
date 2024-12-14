@@ -77,7 +77,6 @@ const GenerateGif = () => {
 
       const commandArgs = constructFFmpegCommand({
         speed: Number(speed.split("x")[0]),
-        frameRate: 5,
 
         inputFile: "input.mp4",
         outputFile: "output.gif",
@@ -86,32 +85,12 @@ const GenerateGif = () => {
       });
 
       await ffmpeg.exec(commandArgs);
-      // console.log(commandArgs);
-
-      // await ffmpeg.exec([
-      //   "-i",
-      //   "input.mp4",
-      //   "-ss",
-      //   `${startTime}`,
-      //   "-t",
-      //   `${duration}`,
-      //   "-vf",
-      //   "fps=10,scale=320:-1:flags=lanczos",
-      //   "-preset",
-      //   "ultrafast",
-      //   "output.gif",
-      // ]);
 
       const gifData = await ffmpeg.readFile("output.gif");
 
       const gifBlob = new Blob([gifData], { type: "image/gif" });
       const gifUrl = URL.createObjectURL(gifBlob);
-      const gifSizeInBytes = gifBlob.size;
 
-      // Convert size to KB or MB for readability
-
-      const gifSizeInMB = (gifSizeInBytes / (1024 * 1024)).toFixed(2); // MB
-      console.log(gifSizeInMB, "size");
       dispatch(setGifState({ gifUrl }));
 
       toast({

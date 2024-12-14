@@ -23,7 +23,7 @@ const VideoTimeline = () => {
     async (duration: number) => {
       if (!video) return;
       setIsLoading(true);
-      const videoUrl = URL.createObjectURL(video);
+      const videoUrl = video;
       const videoElement = document.createElement("video");
       videoElement.src = videoUrl;
 
@@ -94,7 +94,7 @@ const VideoTimeline = () => {
   useEffect(() => {
     if (!video) return;
     const videoElement = document.createElement("video");
-    videoElement.src = URL.createObjectURL(video);
+    videoElement.src = video;
     videoElement.onloadedmetadata = () => {
       // setDuration(videoElement.duration);
       dispatch(
