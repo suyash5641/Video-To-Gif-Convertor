@@ -107,6 +107,12 @@ const GenerateGif = () => {
           description: error.message + " " + error.stack,
           variant: "destructive",
         });
+      } else {
+        toast({
+          title: "Error",
+          description: "error",
+          variant: "destructive",
+        });
       }
     } finally {
       dispatch(setGifState({ isGifGenerating: false }));
