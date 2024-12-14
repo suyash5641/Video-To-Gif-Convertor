@@ -99,11 +99,15 @@ const GenerateGif = () => {
       });
     } catch (error) {
       console.error("Error generating GIF:", error);
-      toast({
-        title: "Error",
-        description: "Failed to generate GIF. Please try again.",
-        variant: "destructive",
-      });
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        console.error("Error stack trace:", error.stack);
+        toast({
+          title: "Error",
+          description: error.message + " " + error.stack,
+          variant: "destructive",
+        });
+      }
     } finally {
       dispatch(setGifState({ isGifGenerating: false }));
     }
