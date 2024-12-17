@@ -8,7 +8,6 @@ import { base64ToBlob, convertFileToBase64 } from "@/lib/base64";
 import { CircularProgress } from "./CircularProgress";
 import { UploadVideoCloudinary } from "@/app/action";
 import UploadVideo from "./UploadVideo";
-const uploadPreset = process.env.NEXT_PUBLIC_UPLOAD_PRESET ?? "";
 
 const VideoToGifConverter = () => {
   const videoState = useSelector((state: RootState) => state.video);
@@ -42,16 +41,17 @@ const VideoToGifConverter = () => {
       const blob = base64ToBlob(video, "video/mp4");
       const formData = new FormData();
       formData.append("file", blob);
-      formData.append("upload_preset", uploadPreset);
-      formData.append("resource_type", "video");
       setProgress(0);
       const interval = setInterval(() => {
         setProgress((prev) => (prev < 90 ? prev + 5 : prev));
       }, 2000);
       const response = await UploadVideoCloudinary(formData);
-
-      if (response) {
-        const extractedFrames = await getVideoFrames(response, 18, duration);
+      if (response?.success) {
+        const extractedFrames = await getVideoFrames(
+          response?.success?.url,
+          18,
+          duration
+        );
         dispatch(setVideoState({ frames: extractedFrames }));
       }
       clearInterval(interval);
