@@ -25,6 +25,7 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@reduxjs/toolkit": "^2.4.0",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.5.1",
     "clsx": "^2.1.1",
     "ffmpeg-extract-frames": "^2.0.2",
     "framer-motion": "^11.13.1",
