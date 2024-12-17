@@ -14,11 +14,24 @@ import { GifSpeed } from "./GifSpeed";
 import { data } from "@/lib/navbardata";
 import GenerateGif from "./GenerateGif";
 import FrameRate from "./FrameRate";
+import { useDispatch } from "react-redux";
+import { convertFileToBase64 } from "@/lib/base64";
+import { setVideoState } from "@/lib/slice/videoSlice";
+import UploadVideo from "./UploadVideo";
 
 const MobileNavbar = () => {
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
 
   const [sheetOpen, setSheetOpen] = React.useState(false);
+
+  const dispatch = useDispatch();
+
+  const handleVideoUpload = async (file: File) => {
+    if (file) {
+      const base64 = await convertFileToBase64(file);
+      dispatch(setVideoState({ file: base64 }));
+    }
+  };
 
   const MobileContent = () => (
     <div className="p-4 space-y-4">
@@ -29,6 +42,12 @@ const MobileNavbar = () => {
         </div>
       )}
       {activeItem.title === "Preview Gif" && <GenerateGif />}
+      {activeItem.title === "Upload" && (
+        <UploadVideo
+          onVideoSelect={handleVideoUpload}
+          buttonText="Upload Video"
+        />
+      )}
     </div>
   );
 

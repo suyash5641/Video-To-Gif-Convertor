@@ -12,6 +12,7 @@ import DummyTimeline from "@/components/DummyTimeline";
 const Page = () => {
   const videoState = useSelector((state: RootState) => state.video);
   const video = videoState?.file;
+  const frame = videoState?.frames;
   return (
     <div className="flex flex-col">
       <div className="flex flex-row">
@@ -33,7 +34,11 @@ const Page = () => {
           </SidebarInset>
         </SidebarProvider>
       </div>
-      {video ? <VideoTimeline /> : <DummyTimeline />}
+      {video && frame?.length ? (
+        <VideoTimeline frames={frame} />
+      ) : (
+        <DummyTimeline />
+      )}
       <MobileNavbar />
     </div>
   );

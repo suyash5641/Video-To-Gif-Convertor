@@ -12,6 +12,7 @@ interface VideoState {
   speed: string;
   frameRate: FrameRateOption | null;
   currentTime: number;
+  frames: string[];
 }
 
 const initialState: VideoState = {
@@ -21,6 +22,7 @@ const initialState: VideoState = {
   speed: "1x",
   frameRate: { rate: 33, maxDuration: 10 },
   currentTime: 0,
+  frames: [],
 };
 
 const videoSlice = createSlice({

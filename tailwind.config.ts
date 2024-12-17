@@ -63,6 +63,15 @@ const config: Config = {
         screens: {
           xs: "340px", // Custom breakpoint for 340px
         },
+        keyframes: {
+          wave: {
+            "0%": { transform: "translateX(0)" },
+            "100%": { transform: "translateX(-100%)" },
+          },
+        },
+        animation: {
+          wave: "wave 5s linear infinite",
+        },
       },
     },
   },

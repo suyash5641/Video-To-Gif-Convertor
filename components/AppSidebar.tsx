@@ -18,10 +18,22 @@ import { GifSpeed } from "./GifSpeed";
 import { data } from "@/lib/navbardata";
 import GenerateGif from "./GenerateGif";
 import FrameRate from "./FrameRate";
+import UploadVideo from "./UploadVideo";
+import { convertFileToBase64 } from "@/lib/base64";
+import { setVideoState } from "@/lib/slice/videoSlice";
+import { useDispatch } from "react-redux";
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
   const { setOpen } = useSidebar();
+  const dispatch = useDispatch();
+
+  const handleVideoUpload = async (file: File) => {
+    if (file) {
+      const base64 = await convertFileToBase64(file);
+      dispatch(setVideoState({ file: base64 }));
+    }
+  };
 
   return (
     <>
@@ -78,6 +90,14 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               )}
 
               {activeItem.title === "Preview Gif" && <GenerateGif />}
+              {activeItem.title === "Upload" && (
+                <div className="flex flex-col justify-center gap-8 w-full">
+                  <UploadVideo
+                    onVideoSelect={handleVideoUpload}
+                    buttonText="Upload Video"
+                  />
+                </div>
+              )}
             </SidebarGroup>
           </SidebarContent>
         </Sidebar>

@@ -1,38 +1,86 @@
 "use client";
-
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-// import { VideoTimeline } from "./VideoTimeline";
-import UploadVideo from "./UploadVideo";
-// import GenerateGif from "./GenerateGif";
-
-// import { Navbar } from "./Navbar";
 import { RootState } from "@/lib/store";
 import { useDispatch, useSelector } from "react-redux";
 import { setVideoState } from "@/lib/slice/videoSlice";
-import { convertFileToBase64 } from "@/lib/base64";
+import { base64ToBlob, convertFileToBase64 } from "@/lib/base64";
+import { CircularProgress } from "./CircularProgress";
+import { UploadVideoCloudinary } from "@/app/action";
+import UploadVideo from "./UploadVideo";
+const uploadPreset = process.env.NEXT_PUBLIC_UPLOAD_PRESET ?? "";
 
 const VideoToGifConverter = () => {
-  // const [video, setVideo] = useState<File | null>(null);
   const videoState = useSelector((state: RootState) => state.video);
   const video = videoState?.file;
   const videoRef = useRef<HTMLVideoElement>(null);
-  // const videoRange = videoState?.range;
-  // const [videoRange, setVideoRange] = useState<number[]>([0, 0]);
-  // const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [loading, setIsLoading] = useState(false);
+
   const dispatch = useDispatch();
 
-  // const handleGifChange = (url: string) => {
-  //   setGifUrl(url);
-  // };
+  function getVideoFrames(
+    videoUrl: string,
+    frameCount: number,
+    videoDuration: number
+  ): string[] {
+    const frames: string[] = [];
+    for (let i = 0; i < frameCount; i++) {
+      const timeOffset = (videoDuration / frameCount) * i;
+      const frameUrl = `${videoUrl
+        .replace("/upload/", `/upload/so_${timeOffset},w_52,h_50/`)
+        .replace(".mp4", "")}.jpg`;
+
+      frames.push(frameUrl);
+    }
+    return frames;
+  }
+
+  const extractFrames = useCallback(
+    async (duration: number, video: string) => {
+      setIsLoading(true);
+      const blob = base64ToBlob(video, "video/mp4");
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append("upload_preset", uploadPreset);
+      formData.append("resource_type", "video");
+      setProgress(0);
+      const interval = setInterval(() => {
+        setProgress((prev) => (prev < 90 ? prev + 5 : prev));
+      }, 1000);
+      const response = await UploadVideoCloudinary(formData);
+
+      if (response) {
+        const extractedFrames = await getVideoFrames(response, 18, duration);
+        dispatch(setVideoState({ frames: extractedFrames }));
+      }
+      clearInterval(interval);
+      setProgress(100);
+      setIsLoading(false);
+    },
+    [dispatch]
+  );
 
   const handleVideoUpload = async (file: File) => {
     if (file) {
       const base64 = await convertFileToBase64(file);
       dispatch(setVideoState({ file: base64 }));
-      if (videoRef.current) {
-        videoRef.current.src = URL.createObjectURL(file);
-      }
+      const videoElement = document.createElement("video");
+      videoElement.src = base64;
+      videoElement.onloadedmetadata = () => {
+        dispatch(
+          setVideoState({
+            duration: videoElement.duration,
+            range: [0, videoElement.duration],
+          })
+        );
+
+        if (videoElement?.duration)
+          extractFrames(videoElement?.duration, base64);
+        if (videoRef.current) {
+          videoRef.current.src = URL.createObjectURL(file);
+        }
+      };
     }
   };
 
@@ -67,7 +115,7 @@ const VideoToGifConverter = () => {
               <video
                 ref={videoRef}
                 className="w-full h-full object-contain"
-                controls
+                controls={!loading}
               >
                 <source src={video} />
               </video>
@@ -77,16 +125,10 @@ const VideoToGifConverter = () => {
                 buttonText="Upload Video"
               />
             )}
+            {loading && <CircularProgress progress={progress} />}
           </div>
-
-          {/* {video && (
-            <div className="flex flex-row justify-center gap-4">
-              <GenerateGif />
-            </div>
-          )} */}
         </div>
       </Card>
-      {/* {video && <VideoTimeline />} */}
     </div>
   );
 };
