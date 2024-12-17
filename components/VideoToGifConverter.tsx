@@ -47,7 +47,7 @@ const VideoToGifConverter = () => {
       setProgress(0);
       const interval = setInterval(() => {
         setProgress((prev) => (prev < 90 ? prev + 5 : prev));
-      }, 1000);
+      }, 2000);
       const response = await UploadVideoCloudinary(formData);
 
       if (response) {
