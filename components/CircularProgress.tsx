@@ -7,7 +7,7 @@ interface CircularProgressProps {
 
 export function CircularProgress({ progress }: CircularProgressProps) {
   return (
-    <div className="absolute  w-16 h-16">
+    <div className="absolute z-20 w-16 h-16">
       <Progress
         value={progress}
         className="w-16 h-16 animate-progress [&>div]:stroke-blue [&>div]:stroke-[0.5rem] [&>div]:fill-transparent"
