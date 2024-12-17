@@ -114,6 +114,7 @@ const VideoToGifConverter = () => {
             {video ? (
               <video
                 ref={videoRef}
+                playsInline
                 className="w-full h-full object-contain"
                 controls={!loading}
               >
