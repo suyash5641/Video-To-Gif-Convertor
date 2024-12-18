@@ -2,7 +2,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
-import { fadeInUp } from "@/lib/animation";
 
 const MainSection = () => {
   const handleNavigation = () => {
@@ -10,40 +9,33 @@ const MainSection = () => {
   };
 
   return (
-    <motion.div
-      className="container mx-auto px-4 py-16 md:py-32"
-      initial="initial"
-      animate="animate"
-      variants={{ animate: { transition: { staggerChildren: 0.1 } } }}
-    >
+    <section className="container mx-auto px-4 py-24 text-center">
       <motion.div
-        className="max-w-3xl mx-auto text-center space-y-8"
-        variants={fadeInUp}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="space-y-8"
       >
-        <motion.h1
-          className="text-5xl md:text-7xl font-extrabold text-gray-800 tracking-tight leading-tight"
-          variants={fadeInUp}
-        >
-          Convert video to GIF <span className="text-violet-600">for free</span>
-        </motion.h1>
-        <motion.p
-          className="text-xl md:text-2xl text-gray-600 font-light"
-          variants={fadeInUp}
-        >
+        <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white">
+          Convert video to{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+            GIF for free
+          </span>
+        </h1>
+        <p className="text-xl md:text-2xl text-gray-300 max-w-2xl mx-auto">
           Transform your videos into eye-catching GIFs with our powerful online
           converter
-        </motion.p>
-        <motion.div variants={fadeInUp}>
-          <Button
-            className="shadow-lg hover:shadow-xl transition-all duration-300"
-            onClick={handleNavigation}
-          >
-            Start Converting Now
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-        </motion.div>
+        </p>
+        <Button
+          size="lg"
+          onClick={handleNavigation}
+          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          Start Converting Now
+          <ArrowRight className="ml-2 h-5 w-5" />
+        </Button>
       </motion.div>
-    </motion.div>
+    </section>
   );
 };
 

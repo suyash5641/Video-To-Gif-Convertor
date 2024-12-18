@@ -16,6 +16,7 @@ const VideoTimeline: React.FC<VideoTimelineProps> = ({ frames }) => {
   const dispatch = useDispatch();
   const duration = videoState?.duration;
   const videoRange = videoState?.range;
+  const loading = videoState?.loading;
   const [value, setValue] = useState<number[]>([0]);
 
   const handleRangeChange = (value: number[]) => {
@@ -42,7 +43,7 @@ const VideoTimeline: React.FC<VideoTimelineProps> = ({ frames }) => {
 
   return (
     <div className="fixed bottom-[40px]  z-10  border-t md:relative md:bottom-auto bg-customdarkbackground w-full space-y-4 flex items-center justify-start">
-      {!frames.length ? (
+      {!frames.length || loading ? (
         <>
           <div className="w-full space-y-4 flex items-center justify-center" />
         </>

@@ -37,13 +37,13 @@ export function FeatureSection() {
   return (
     <div className="container mx-auto px-4 py-24">
       <motion.div
-        className="max-w-4xl mx-auto bg-white/60 backdrop-blur-sm rounded-3xl p-12 text-center shadow-xl border border-violet-100"
+        className="max-w-4xl mx-auto bg-gray-800/30 backdrop-blur-sm rounded-3xl p-12 text-center shadow-xl border-0"
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
       >
         <motion.h2
-          className="text-3xl md:text-4xl font-bold text-gray-800 mb-12"
+          className="text-3xl md:text-4xl font-bold text-white-800 mb-12"
           variants={fadeInUp}
         >
           Why Choose Our Converter?

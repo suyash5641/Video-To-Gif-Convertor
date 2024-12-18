@@ -19,20 +19,16 @@ import { data } from "@/lib/navbardata";
 import GenerateGif from "./GenerateGif";
 import FrameRate from "./FrameRate";
 import UploadVideo from "./UploadVideo";
-import { convertFileToBase64 } from "@/lib/base64";
-import { setVideoState } from "@/lib/slice/videoSlice";
+import { uploadVideo } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
+  const dispatch = useDispatch();
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
   const { setOpen } = useSidebar();
-  const dispatch = useDispatch();
 
   const handleVideoUpload = async (file: File) => {
-    if (file) {
-      const base64 = await convertFileToBase64(file);
-      dispatch(setVideoState({ file: base64 }));
-    }
+    await uploadVideo({ file, dispatch });
   };
 
   return (

@@ -1,98 +1,39 @@
 "use client";
-import { useRef, useEffect, useState, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { RootState } from "@/lib/store";
-import { useDispatch, useSelector } from "react-redux";
-import { setVideoState } from "@/lib/slice/videoSlice";
-import { base64ToBlob, convertFileToBase64 } from "@/lib/base64";
 import { CircularProgress } from "./CircularProgress";
-import { UploadVideoCloudinary } from "@/app/action";
 import UploadVideo from "./UploadVideo";
+import { RootState } from "@/lib/store";
+import { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { uploadVideo } from "@/lib/utils";
 
 const VideoToGifConverter = () => {
+  const dispatch = useDispatch();
   const videoState = useSelector((state: RootState) => state.video);
   const video = videoState?.file;
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [progress, setProgress] = useState(0);
-  const [loading, setIsLoading] = useState(false);
-
-  const dispatch = useDispatch();
-
-  function getVideoFrames(
-    videoUrl: string,
-    frameCount: number,
-    videoDuration: number
-  ): string[] {
-    const frames: string[] = [];
-    for (let i = 0; i < frameCount; i++) {
-      const timeOffset = (videoDuration / frameCount) * i;
-      const frameUrl = `${videoUrl
-        .replace("/upload/", `/upload/so_${timeOffset},w_52,h_50/`)
-        .replace(".mp4", "")}.jpg`;
-
-      frames.push(frameUrl);
-    }
-    return frames;
-  }
-
-  const extractFrames = useCallback(
-    async (duration: number, video: string) => {
-      setIsLoading(true);
-      const blob = base64ToBlob(video, "video/mp4");
-      const formData = new FormData();
-      formData.append("file", blob);
-      setProgress(0);
-      const interval = setInterval(() => {
-        setProgress((prev) => (prev < 90 ? prev + 5 : prev));
-      }, 2000);
-      const response = await UploadVideoCloudinary(formData);
-      if (response?.success) {
-        const extractedFrames = await getVideoFrames(
-          response?.success?.url,
-          18,
-          duration
-        );
-        dispatch(setVideoState({ frames: extractedFrames }));
-      }
-      clearInterval(interval);
-      setProgress(100);
-      setIsLoading(false);
-    },
-    [dispatch]
-  );
-
-  const handleVideoUpload = async (file: File) => {
-    if (file) {
-      const base64 = await convertFileToBase64(file);
-      dispatch(setVideoState({ file: base64 }));
-      const videoElement = document.createElement("video");
-      videoElement.src = base64;
-      videoElement.onloadedmetadata = () => {
-        dispatch(
-          setVideoState({
-            duration: videoElement.duration,
-            range: [0, videoElement.duration],
-          })
-        );
-
-        if (videoElement?.duration)
-          extractFrames(videoElement?.duration, base64);
-        if (videoRef.current) {
-          videoRef.current.src = URL.createObjectURL(file);
-        }
-      };
-    }
-  };
+  const progress = videoState?.progress;
+  const loading = videoState?.loading;
 
   const currentTime = useSelector(
     (state: RootState) => state.video.currentTime
   );
+
+  const handleVideoUpload = async (file: File) => {
+    await uploadVideo({ file, dispatch });
+  };
 
   useEffect(() => {
     if (videoRef.current) {
       videoRef.current.currentTime = currentTime;
     }
   }, [currentTime]);
+
+  useEffect(() => {
+    if (videoRef.current && video) {
+      videoRef.current.src = video;
+    }
+  }, [video]);
 
   return (
     <div className="min-h-[calc(100vh_-_150px)] bg-lightbluecustom p-4 px-0 md:p-8 md:px-0 flex flex-col justify-center items-center gap-6 ">

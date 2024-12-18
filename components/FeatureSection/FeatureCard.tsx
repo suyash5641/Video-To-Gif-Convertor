@@ -17,15 +17,15 @@ export function FeatureCard({
 }: FeatureCardProps) {
   return (
     <motion.div
-      className={`p-6 rounded-xl transition-all duration-300 border border-gray-200 shadow-md ${color} bg-opacity-20 hover:bg-opacity-30 overflow-hidden h-full flex flex-col`}
+      className={`p-6 rounded-xl transition-all duration-300 border border-gray-700 shadow-md ${color} bg-opacity-50 hover:bg-opacity-60 overflow-hidden h-full flex flex-col`}
       // whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
       <div className="flex items-center justify-center mb-4">
         <Icon className={`w-10 h-10 ${color.replace("bg-", "text-")}`} />
       </div>
-      <h3 className="text-2xl font-semibold text-gray-800 mb-3">{title}</h3>
-      <p className="text-gray-700 break-words overflow-y-auto flex-grow">
+      <h3 className="text-2xl font-semibold text-white-800 mb-3">{title}</h3>
+      <p className="text-white-700 break-words overflow-y-auto flex-grow">
         {description}
       </p>
     </motion.div>
