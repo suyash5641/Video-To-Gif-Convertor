@@ -4,7 +4,6 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../lib/store";
 import AppSidebar from "@/components/AppSidebar";
-import MobileNavbar from "@/components/MobileNavbar";
 import VideoTimeline from "@/components/VideoTimeline";
 import VideoToGifConverter from "@/components/VideoToGifConverter";
 import DummyTimeline from "@/components/DummyTimeline";
@@ -39,7 +38,6 @@ const Page = () => {
       ) : (
         <DummyTimeline />
       )}
-      <MobileNavbar />
     </div>
   );
 };

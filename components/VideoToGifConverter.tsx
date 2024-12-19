@@ -6,8 +6,10 @@ import { RootState } from "@/lib/store";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadVideo } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 const VideoToGifConverter = () => {
+  const { toast } = useToast();
   const dispatch = useDispatch();
   const videoState = useSelector((state: RootState) => state.video);
   const video = videoState?.file;
@@ -20,7 +22,7 @@ const VideoToGifConverter = () => {
   );
 
   const handleVideoUpload = async (file: File) => {
-    await uploadVideo({ file, dispatch });
+    await uploadVideo({ file, dispatch, toast });
   };
 
   useEffect(() => {

@@ -7,13 +7,23 @@ import { AppDispatch } from "./store";
 interface VideoUploadOptions {
   file: File;
   dispatch: AppDispatch;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  toast: any;
+}
+
+export interface UploadResponse {
+  success: boolean;
+  url?: string;
+  message?: string;
 }
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function UploadVideoCloudinary(formData: FormData) {
+export async function UploadVideoCloudinary(
+  formData: FormData
+): Promise<UploadResponse> {
   try {
     const response = await fetch(
       `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
@@ -23,18 +33,28 @@ export async function UploadVideoCloudinary(formData: FormData) {
       }
     );
     const data = await response.json();
+
     if (response.ok) {
-      return data.secure_url;
+      return { success: true, url: data.secure_url };
     } else {
-      console.error("Upload Error:", data.error);
+      console.error("Upload Error:", data.error.message);
       throw new Error(data.error.message || "Failed to upload video");
     }
   } catch (error) {
-    throw error;
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return {
+      success: false,
+      message: errorMessage,
+    };
   }
 }
 
-export const uploadVideo = async ({ file, dispatch }: VideoUploadOptions) => {
+export const uploadVideo = async ({
+  file,
+  dispatch,
+  toast,
+}: VideoUploadOptions) => {
   if (file) {
     dispatch(setLoading(true));
     const base64 = await convertFileToBase64(file);
@@ -42,7 +62,7 @@ export const uploadVideo = async ({ file, dispatch }: VideoUploadOptions) => {
     const videoElement = document.createElement("video");
     videoElement.src = base64;
 
-    videoElement.onloadedmetadata = () => {
+    videoElement.onloadedmetadata = async () => {
       dispatch(
         setVideoState({
           duration: videoElement.duration,
@@ -52,9 +72,19 @@ export const uploadVideo = async ({ file, dispatch }: VideoUploadOptions) => {
       );
 
       if (videoElement?.duration) {
-        dispatch(
-          extractFrames({ duration: videoElement.duration, video: base64 })
+        const result = await dispatch(
+          extractFrames({
+            duration: videoElement.duration,
+            video: base64,
+          })
         );
+        if (extractFrames.rejected.match(result)) {
+          toast({
+            title: "Error",
+            description: result?.payload?.errorMessage,
+            variant: "destructive",
+          });
+        }
       }
     };
 

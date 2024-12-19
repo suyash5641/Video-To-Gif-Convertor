@@ -16,8 +16,10 @@ import FrameRate from "./FrameRate";
 import UploadVideo from "./UploadVideo";
 import { uploadVideo } from "@/lib/utils";
 import { useDispatch } from "react-redux";
+import { useToast } from "@/hooks/use-toast";
 
 const MobileNavbar = () => {
+  const { toast } = useToast();
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
 
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -26,7 +28,7 @@ const MobileNavbar = () => {
 
   const handleVideo = async (file: File) => {
     if (file) {
-      await uploadVideo({ file, dispatch });
+      await uploadVideo({ file, dispatch, toast });
     }
   };
 

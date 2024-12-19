@@ -32,56 +32,78 @@ const initialState: VideoState = {
   loading: false,
 };
 
-// Async action for extracting frames
-export const extractFrames = createAsyncThunk(
+interface ExtractFramesResponse {
+  success: boolean;
+  url?: string;
+  error?: boolean;
+  errorMessage?: string;
+}
+
+interface ExtractFramesResponse {
+  success: boolean;
+  url?: string;
+  error?: boolean;
+  errorMessage?: string;
+}
+
+interface ExtractFramesErrorResponse {
+  success: false;
+  error: true;
+  errorMessage: string;
+}
+
+export const extractFrames = createAsyncThunk<
+  ExtractFramesResponse,
+  { duration: number; video: string },
+  { rejectValue: ExtractFramesErrorResponse }
+>(
   "video/extractFrames",
   async (
     { duration, video }: { duration: number; video: string },
-    { dispatch, getState }
+    { dispatch, getState, rejectWithValue }
   ) => {
-    const blob = base64ToBlob(video, "video/mp4");
-    const formData = new FormData();
-    formData.append("file", blob);
-    formData.append(
-      "upload_preset",
-      process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? ""
-    );
-    formData.append("resource_type", "video");
-
-    const interval = setInterval(() => {
-      // Access the current state (if needed, you can get the latest state using a selector or useSelector in the component)
-      const state = getState() as RootState;
-      const currentProgress = state.video.progress;
-
-      // Update progress
-      const updatedProgress =
-        currentProgress < 90 ? currentProgress + 5 : currentProgress;
-
-      // Dispatch the updated progress
-      dispatch(setVideoState({ progress: updatedProgress }));
-
-      // Clear interval if progress reaches 90
-      if (updatedProgress >= 90) {
-        clearInterval(interval);
-      }
-    }, 2000);
-
     try {
+      const blob = base64ToBlob(video, "video/mp4");
+      const formData = new FormData();
+      formData.append("file", blob);
+      formData.append(
+        "upload_preset",
+        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? ""
+      );
+      formData.append("resource_type", "video");
+
       const response = await UploadVideoCloudinary(formData);
-      if (response) {
-        const frames = getVideoFrames(response, 18, duration);
+
+      const interval = setInterval(() => {
+        const state = getState() as RootState;
+        const currentProgress = state.video.progress;
+
+        const updatedProgress =
+          currentProgress < 90 ? currentProgress + 5 : currentProgress;
+
+        dispatch(setVideoState({ progress: updatedProgress }));
+
+        if (updatedProgress >= 90) {
+          clearInterval(interval);
+        }
+      }, 2000);
+
+      if (response.success && response?.url) {
+        const frames = getVideoFrames(response?.url, 18, duration);
         dispatch(setVideoState({ frames, progress: 100 }));
+        return { success: true, url: response?.url };
+      } else {
+        const errorMessage = response?.message || "Failed to upload video";
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.log(error);
-      throw new Error("Failed to upload video.");
-    } finally {
-      clearInterval(interval);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to upload video";
+      return rejectWithValue({ error: true, errorMessage, success: false });
     }
   }
 );
 
-// Helper function to get video frames
 function getVideoFrames(
   videoUrl: string,
   frameCount: number,
