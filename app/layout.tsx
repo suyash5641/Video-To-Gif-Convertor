@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ReduxProvider } from "../components/ReduxProvider";
 import { ThemeProvider } from "next-themes";
+import { AbortControllerProvider } from "@/components/AbortProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -36,10 +37,12 @@ export default function RootLayout({
           defaultTheme="dark"
           disableTransitionOnChange
         >
-          <ReduxProvider>
-            {children}
-            <Toaster />
-          </ReduxProvider>
+          <AbortControllerProvider>
+            <ReduxProvider>
+              {children}
+              <Toaster />
+            </ReduxProvider>
+          </AbortControllerProvider>
         </ThemeProvider>
       </body>
     </html>

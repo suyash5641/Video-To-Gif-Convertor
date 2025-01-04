@@ -1,12 +1,13 @@
 "use client";
 import { Card } from "@/components/ui/card";
-import { CircularProgress } from "./CircularProgress";
 import UploadVideo from "./UploadVideo";
 import { RootState } from "@/lib/store";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { uploadVideo } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { DialogBox } from "./Dialog";
+import { useAbortControllerContext } from "./AbortProvider";
 
 const VideoToGifConverter = () => {
   const { toast } = useToast();
@@ -16,13 +17,15 @@ const VideoToGifConverter = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = videoState?.progress;
   const loading = videoState?.loading;
+  const { startNewUpload } = useAbortControllerContext();
 
   const currentTime = useSelector(
     (state: RootState) => state.video.currentTime
   );
 
   const handleVideoUpload = async (file: File) => {
-    await uploadVideo({ file, dispatch, toast });
+    const signal = startNewUpload();
+    await uploadVideo({ file, dispatch, toast, signal });
   };
 
   useEffect(() => {
@@ -69,10 +72,10 @@ const VideoToGifConverter = () => {
                 buttonText="Upload Video"
               />
             )}
-            {loading && <CircularProgress progress={progress} />}
           </div>
         </div>
       </Card>
+      {loading && <DialogBox progress={progress} />}
     </div>
   );
 };

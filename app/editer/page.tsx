@@ -5,8 +5,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../lib/store";
 import AppSidebar from "@/components/AppSidebar";
 import VideoTimeline from "@/components/VideoTimeline";
-import VideoToGifConverter from "@/components/VideoToGifConverter";
+
 import DummyTimeline from "@/components/DummyTimeline";
+import VideoToGifConverter from "@/components/VideoToGifConverter";
 
 const Page = () => {
   const videoState = useSelector((state: RootState) => state.video);

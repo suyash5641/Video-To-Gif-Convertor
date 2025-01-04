@@ -46,20 +46,30 @@ const constructFFmpegCommand = ({
 
 const GenerateGif = () => {
   const videoState = useSelector((state: RootState) => state.video);
-
   const gifState = useSelector((state: RootState) => state.gif);
   const dispatch = useDispatch();
-
   const videoRange = videoState?.range;
   const speed = videoState?.speed;
   const video = videoState?.file;
+  const gifFrameRate = videoState?.frameRate;
   const isGifGenerating = gifState?.isGifGenerating;
   const gifUrl = gifState?.gifUrl;
-
   const { toast } = useToast();
 
+  const getFrameRateForDuration = useCallback(
+    (duration: number) => {
+      if (gifFrameRate?.maxDuration) {
+        return gifFrameRate?.maxDuration >= duration
+          ? gifFrameRate?.rate
+          : null;
+      }
+      return null;
+    },
+    [gifFrameRate?.maxDuration, gifFrameRate?.rate]
+  );
+
   const generateGif = useCallback(async () => {
-    if (!video) return;
+    if (!video || !gifFrameRate?.maxDuration) return;
     dispatch(setGifState({ isGifGenerating: true }));
     try {
       if (!ffmpeg.loaded) {
@@ -72,7 +82,16 @@ const GenerateGif = () => {
       const startTime = videoRange[0];
       const endTime = videoRange[1];
       const duration = endTime - startTime;
+      const frameRate = getFrameRateForDuration(duration);
 
+      if (!frameRate) {
+        toast({
+          title: "Change Frame Rate or change duration",
+          description: "No suitable frame rate found for the given duration",
+        });
+        dispatch(setGifState({ isGifGenerating: false }));
+        return;
+      }
       await ffmpeg.writeFile("input.mp4", await fetchFile(video));
 
       const commandArgs = constructFFmpegCommand({
@@ -107,7 +126,15 @@ const GenerateGif = () => {
     } finally {
       dispatch(setGifState({ isGifGenerating: false }));
     }
-  }, [video, dispatch, videoRange, speed, toast]);
+  }, [
+    video,
+    gifFrameRate?.maxDuration,
+    dispatch,
+    videoRange,
+    getFrameRateForDuration,
+    speed,
+    toast,
+  ]);
 
   const showGifPreview = () => {
     if (isGifGenerating) {
@@ -126,7 +153,7 @@ const GenerateGif = () => {
             />
             {/* Download Button */}
           </div>
-          <Button asChild variant="secondary">
+          <Button asChild variant="secondary" className="cursor-pointer">
             <a href={gifUrl} download="output.gif">
               Download GIF
             </a>

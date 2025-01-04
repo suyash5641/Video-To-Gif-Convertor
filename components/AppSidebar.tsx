@@ -31,6 +31,7 @@ import UploadVideo from "./UploadVideo";
 import { uploadVideo } from "@/lib/utils";
 import { useDispatch } from "react-redux";
 import { useToast } from "@/hooks/use-toast";
+import { useAbortControllerContext } from "./AbortProvider";
 
 const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const dispatch = useDispatch();
@@ -38,9 +39,11 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const [sheetOpen, setSheetOpen] = React.useState(false);
   const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
   const { setOpen } = useSidebar();
+  const { startNewUpload } = useAbortControllerContext();
 
   const handleVideoUpload = async (file: File) => {
-    await uploadVideo({ file, dispatch, toast });
+    const signal = startNewUpload();
+    await uploadVideo({ file, dispatch, toast, signal });
   };
 
   const MobileContent = () => (

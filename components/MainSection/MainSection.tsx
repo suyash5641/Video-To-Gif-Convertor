@@ -1,6 +1,5 @@
 "use client";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
 
 const MainSection = () => {
@@ -29,10 +28,9 @@ const MainSection = () => {
         <Button
           size="lg"
           onClick={handleNavigation}
-          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+          className="cursor-pointer relative z-[15] bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all duration-300"
         >
           Start Converting Now
-          <ArrowRight className="ml-2 h-5 w-5" />
         </Button>
       </motion.div>
     </section>

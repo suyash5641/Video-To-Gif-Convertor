@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { UploadVideoCloudinary } from "../utils";
 import { base64ToBlob } from "../base64";
 import { RootState } from "../store";
+import { getVideoFrames } from "../utils";
 
 interface FrameRateOption {
   rate: number;
@@ -18,6 +18,7 @@ interface VideoState {
   frames: string[];
   progress: number;
   loading: boolean;
+  videoUrl: string | null;
 }
 
 const initialState: VideoState = {
@@ -30,14 +31,8 @@ const initialState: VideoState = {
   frames: [],
   progress: 0,
   loading: false,
+  videoUrl: null,
 };
-
-interface ExtractFramesResponse {
-  success: boolean;
-  url?: string;
-  error?: boolean;
-  errorMessage?: string;
-}
 
 interface ExtractFramesResponse {
   success: boolean;
@@ -52,14 +47,54 @@ interface ExtractFramesErrorResponse {
   errorMessage: string;
 }
 
+export const uploadVideoToCloudinary = createAsyncThunk<
+  { success: boolean; url?: string; message?: string },
+  { formData: FormData | null; signal: AbortSignal },
+  { rejectValue: { success: false; message: string } }
+>(
+  "video/uploadToCloudinary",
+  async ({ formData, signal }, { rejectWithValue }) => {
+    try {
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/video/upload`,
+        {
+          method: "POST",
+          body: formData,
+          signal,
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        return { success: true, url: data.secure_url };
+      } else {
+        const errorMessage = data.error?.message || "Failed to upload video";
+        console.error("Upload Error:", errorMessage);
+        return rejectWithValue({ success: false, message: errorMessage });
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return {
+          success: false,
+          message: "Upload aborted",
+        };
+      }
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      return rejectWithValue({ success: false, message: errorMessage });
+    }
+  }
+);
+
 export const extractFrames = createAsyncThunk<
   ExtractFramesResponse,
-  { duration: number; video: string },
+  { duration: number; video: string; signal: AbortSignal },
   { rejectValue: ExtractFramesErrorResponse }
 >(
   "video/extractFrames",
   async (
-    { duration, video }: { duration: number; video: string },
+    { duration, video, signal },
     { dispatch, getState, rejectWithValue }
   ) => {
     try {
@@ -72,10 +107,9 @@ export const extractFrames = createAsyncThunk<
       );
       formData.append("resource_type", "video");
 
-      const response = await UploadVideoCloudinary(formData);
-
       const interval = setInterval(() => {
         const state = getState() as RootState;
+
         const currentProgress = state.video.progress;
 
         const updatedProgress =
@@ -88,11 +122,18 @@ export const extractFrames = createAsyncThunk<
         }
       }, 2000);
 
+      const response = await dispatch(
+        uploadVideoToCloudinary({ formData, signal })
+      ).unwrap();
+
       if (response.success && response?.url) {
         const frames = getVideoFrames(response?.url, 18, duration);
-        dispatch(setVideoState({ frames, progress: 100 }));
+        dispatch(
+          setVideoState({ frames, progress: 100, videoUrl: response?.url })
+        );
         return { success: true, url: response?.url };
       } else {
+        clearInterval(interval);
         const errorMessage = response?.message || "Failed to upload video";
         throw new Error(errorMessage);
       }
@@ -100,26 +141,10 @@ export const extractFrames = createAsyncThunk<
       const errorMessage =
         error instanceof Error ? error.message : "Failed to upload video";
       return rejectWithValue({ error: true, errorMessage, success: false });
+    } finally {
     }
   }
 );
-
-function getVideoFrames(
-  videoUrl: string,
-  frameCount: number,
-  videoDuration: number
-): string[] {
-  const frames: string[] = [];
-  for (let i = 0; i < frameCount; i++) {
-    const timeOffset = (videoDuration / frameCount) * i;
-    const frameUrl = `${videoUrl
-      .replace("/upload/", `/upload/so_${timeOffset},w_52,h_50/`)
-      .replace(".mp4", "")}.jpg`;
-
-    frames.push(frameUrl);
-  }
-  return frames;
-}
 
 const videoSlice = createSlice({
   name: "video",
@@ -136,17 +161,9 @@ const videoSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addCase(extractFrames.pending, (state) => {
-        state.loading = true;
-        state.progress = 0;
-      })
-      .addCase(extractFrames.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(extractFrames.rejected, (state) => {
-        state.loading = false;
-      });
+    builder.addCase(extractFrames.pending, (state) => {
+      state.progress = 0;
+    });
   },
 });
 
