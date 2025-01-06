@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
-import { ReduxProvider } from "../components/ReduxProvider";
-import { ThemeProvider } from "next-themes";
+import { ReduxProvider } from "./ReduxProvider";
 import { AbortControllerProvider } from "@/components/AbortProvider";
+import { ThemeProvider } from "./ThemeProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,11 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-black`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           <AbortControllerProvider>
             <ReduxProvider>
               {children}

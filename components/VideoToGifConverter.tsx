@@ -24,6 +24,15 @@ const VideoToGifConverter = () => {
   );
 
   const handleVideoUpload = async (file: File) => {
+    const maxSizeInBytes = 100 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      toast({
+        title: "Error",
+        description: "The file size exceeds 100MB.",
+        variant: "destructive",
+      });
+      return;
+    }
     const signal = startNewUpload();
     await uploadVideo({ file, dispatch, toast, signal });
   };
@@ -46,7 +55,7 @@ const VideoToGifConverter = () => {
         className={
           video
             ? "max-w-4xl mx-auto p-2 sm:p-4 w-[82%] xs:w-[75%] sm:w-[60%] md:w-[50%] border-0"
-            : "max-w-4xl mx-auto p-2 sm:p-4 w-[82%] xs:w-[75%] sm:w-[45%] md:w-[40%]"
+            : "max-w-4xl mx-auto p-2 sm:p-4 w-[85%] xs:w-[75%] sm:w-[45%] md:w-[52%]"
         }
       >
         <div className="grid gap-8">
@@ -67,10 +76,13 @@ const VideoToGifConverter = () => {
                 <source src={video} />
               </video>
             ) : (
-              <UploadVideo
-                onVideoSelect={handleVideoUpload}
-                buttonText="Upload Video"
-              />
+              <div className="flex flex-col justify-center items-center gap-2 md:gap-4">
+                <UploadVideo
+                  onVideoSelect={handleVideoUpload}
+                  buttonText="Upload Video"
+                />
+                <p className="text-gray-300 text-sm">Max file size 100mb</p>
+              </div>
             )}
           </div>
         </div>

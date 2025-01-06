@@ -96,7 +96,7 @@ const GenerateGif = () => {
 
       const commandArgs = constructFFmpegCommand({
         speed: Number(speed.split("x")[0]),
-
+        frameRate,
         inputFile: "input.mp4",
         outputFile: "output.gif",
         startTime: startTime,

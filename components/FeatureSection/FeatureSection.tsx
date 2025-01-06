@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Zap, Crown, Smile, Shield } from "lucide-react";
+import { Zap, Crown, Smile, Edit } from "lucide-react";
 import { FeatureCard } from "./FeatureCard";
 import { fadeInUp, staggerChildren } from "@/lib/animation";
 
@@ -25,11 +25,10 @@ const features = [
     color: "bg-blue-400",
   },
   {
-    title: "Secure",
-    description:
-      "Your files are processed securely and never stored on our servers.",
-    icon: Shield,
-    color: "bg-red-400",
+    title: "Customizable GIFs",
+    description: "Choose start and end times and adjust frame rates for GIFs.",
+    icon: Edit,
+    color: "bg-purple-400",
   },
 ];
 

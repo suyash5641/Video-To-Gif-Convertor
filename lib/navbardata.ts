@@ -2,7 +2,27 @@ import { File, Upload, ListFilter } from "lucide-react";
 export const data = {
   navMain: [
     {
-      title: "Settings",
+      title: "Filter",
+      url: "#",
+      icon: ListFilter,
+      isActive: true,
+    },
+    {
+      title: "Preview Gif",
+      url: "#",
+      icon: File,
+      isActive: false,
+    },
+    {
+      title: "Upload Video",
+      url: "#",
+      icon: Upload,
+      isActive: false,
+    },
+  ],
+  navMobile: [
+    {
+      title: "Filter",
       url: "#",
       icon: ListFilter,
       isActive: true,

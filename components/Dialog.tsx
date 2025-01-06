@@ -19,15 +19,15 @@ export function DialogBox({ progress }: CircularProgressProps) {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent>
+      <DialogContent className="p-4 absolute top-10 left-1/2 -translate-x-1/2 translate-y-0">
         <DialogHeader>
-          <DialogTitle>Edit profile</DialogTitle>
+          <DialogTitle>Video Upload</DialogTitle>
         </DialogHeader>
         <Progress value={progress} />
-        <div className="mt-4 flex justify-center items-center flex-wrap space-x-2">
-          <p className="text-sm text-gray-500">{`Uploading Video : ${progress}%`}</p>
+        <div className="mt-4 flex justify-center items-center flex-wrap space-x-2 gap-4">
+          <p className="text-sm text-gray">{`Uploading : ${progress}%`}</p>
           <Button variant="destructive" onClick={cancelUpload}>
-            Cancel Upload
+            Cancel
           </Button>
         </div>
       </DialogContent>

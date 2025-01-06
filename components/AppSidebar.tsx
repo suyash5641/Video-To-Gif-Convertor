@@ -42,13 +42,22 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
   const { startNewUpload } = useAbortControllerContext();
 
   const handleVideoUpload = async (file: File) => {
+    const maxSizeInBytes = 100 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      toast({
+        title: "Error",
+        description: "The file size exceeds 100MB.",
+        variant: "destructive",
+      });
+      return;
+    }
     const signal = startNewUpload();
     await uploadVideo({ file, dispatch, toast, signal });
   };
 
   const MobileContent = () => (
     <div className="p-4 space-y-4">
-      {activeItem.title === "Settings" && (
+      {activeItem.title === "Filter" && (
         <div className="flex flex-col justify-center gap-8">
           <GifSpeed />
           <FrameRate />
@@ -111,7 +120,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               <SidebarTrigger className="-ml-1" icon={<ChevronRight />} />
             </div>
             <SidebarGroup className="px-4 flex flex-row">
-              {activeItem.title === "Settings" && (
+              {activeItem.title === "Filter" && (
                 <div className="flex flex-col justify-center gap-8">
                   <GifSpeed />
                   <FrameRate />
@@ -119,7 +128,7 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
               )}
 
               {activeItem.title === "Preview Gif" && <GenerateGif />}
-              {activeItem.title === "Upload" && (
+              {activeItem.title === "Upload Video" && (
                 <div className="flex flex-col justify-center gap-8 w-full">
                   <UploadVideo
                     onVideoSelect={handleVideoUpload}
@@ -134,23 +143,24 @@ const AppSidebar = ({ ...props }: React.ComponentProps<typeof Sidebar>) => {
       <div className="fixed bottom-0 left-0 right-0 z-50 flex md:hidden">
         <nav className="w-full border-t bg-background">
           <div className="flex h-10 items-center justify-around px-4">
-            {data.navMain.map((item) => (
+            {data.navMobile.map((item) => (
               <Sheet
                 key={item.title}
                 open={activeItem.title === item.title && sheetOpen}
                 onOpenChange={setSheetOpen}
               >
-                <SheetTrigger asChild>
+                <SheetTrigger asChild className="flex flex-col ">
                   <button
                     onClick={() => {
                       setActiveItem(item);
                       setSheetOpen(true);
                     }}
-                    className={`flex h-10 w-10 items-center justify-center rounded-md ${
+                    className={`flex h-10 w-18 px-2 items-center justify-center rounded-md ${
                       activeItem.title === item.title ? "bg-muted" : ""
                     }`}
                   >
-                    <item.icon className="h-5 w-5" />
+                    <item.icon className="h-4 w-4" />
+                    <p className="text-xs">{item?.title}</p>
                   </button>
                 </SheetTrigger>
                 <SheetContent side="bottom" className="h-auto">
