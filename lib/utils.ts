@@ -64,13 +64,13 @@ export const getVideoFrames = (
   fileType: string
 ): string[] => {
   const frames: string[] = [];
-  console.log(videoUrl, `.${fileType}`, "type", fileType);
+
   for (let i = 0; i < frameCount; i++) {
     const timeOffset = (videoDuration / frameCount) * i;
     const frameUrl = `${videoUrl
       .replace("/upload/", `/upload/so_${timeOffset},w_52,h_50/`)
       .replace(`.${fileType}`, "")}.jpg`;
-    console.log(frameUrl, "test");
+
     frames.push(frameUrl);
   }
   return frames;
