@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { base64ToBlob } from "../base64";
 import { RootState } from "../store";
 import { getVideoFrames } from "../utils";
+import { data } from "../navbardata";
 
 interface FrameRateOption {
   rate: number;
@@ -19,6 +19,7 @@ interface VideoState {
   progress: number;
   loading: boolean;
   videoUrl: string | null;
+  fileType: string;
 }
 
 const initialState: VideoState = {
@@ -32,6 +33,7 @@ const initialState: VideoState = {
   progress: 0,
   loading: false,
   videoUrl: null,
+  fileType: "",
 };
 
 interface ExtractFramesResponse {
@@ -48,7 +50,13 @@ interface ExtractFramesErrorResponse {
 }
 
 export const uploadVideoToCloudinary = createAsyncThunk<
-  { success: boolean; url?: string; message?: string },
+  {
+    success: boolean;
+    url?: string;
+    message?: string;
+    duration?: number;
+    format?: string;
+  },
   { formData: FormData | null; signal: AbortSignal },
   { rejectValue: { success: false; message: string } }
 >(
@@ -67,7 +75,12 @@ export const uploadVideoToCloudinary = createAsyncThunk<
       const data = await response.json();
 
       if (response.ok) {
-        return { success: true, url: data.secure_url };
+        return {
+          success: true,
+          url: data.secure_url,
+          duration: data?.duration,
+          format: data?.format,
+        };
       } else {
         const errorMessage = data.error?.message || "Failed to upload video";
         console.error("Upload Error:", errorMessage);
@@ -89,18 +102,14 @@ export const uploadVideoToCloudinary = createAsyncThunk<
 
 export const extractFrames = createAsyncThunk<
   ExtractFramesResponse,
-  { duration: number; video: string; signal: AbortSignal },
+  { signal: AbortSignal; file: File },
   { rejectValue: ExtractFramesErrorResponse }
 >(
   "video/extractFrames",
-  async (
-    { duration, video, signal },
-    { dispatch, getState, rejectWithValue }
-  ) => {
+  async ({ signal, file }, { dispatch, getState, rejectWithValue }) => {
     try {
-      const blob = base64ToBlob(video, "video/mp4");
       const formData = new FormData();
-      formData.append("file", blob);
+      formData.append("file", file);
       formData.append(
         "upload_preset",
         process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? ""
@@ -126,10 +135,31 @@ export const extractFrames = createAsyncThunk<
         uploadVideoToCloudinary({ formData, signal })
       ).unwrap();
 
-      if (response.success && response?.url) {
-        const frames = getVideoFrames(response?.url, 18, duration);
+      if (
+        response.success &&
+        response?.url &&
+        response?.duration &&
+        response?.format
+      ) {
+        const frames = getVideoFrames(
+          response?.url,
+          18,
+          response?.duration,
+          response?.format
+        );
         dispatch(
-          setVideoState({ frames, progress: 100, videoUrl: response?.url })
+          setVideoState({
+            frames,
+            progress: 100,
+            videoUrl: response?.url,
+            fileType: response?.format,
+            duration: response?.duration,
+            file: response?.url,
+            range: [
+              0,
+              Math.min(response?.duration, data?.frameOptions[8]?.maxDuration),
+            ],
+          })
         );
         return { success: true, url: response?.url };
       } else {

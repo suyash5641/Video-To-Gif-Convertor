@@ -49,6 +49,7 @@ const GenerateGif = () => {
   const gifState = useSelector((state: RootState) => state.gif);
   const dispatch = useDispatch();
   const videoRange = videoState?.range;
+  const fileType = videoState?.fileType;
   const speed = videoState?.speed;
   const video = videoState?.file;
   const gifFrameRate = videoState?.frameRate;
@@ -92,12 +93,12 @@ const GenerateGif = () => {
         dispatch(setGifState({ isGifGenerating: false }));
         return;
       }
-      await ffmpeg.writeFile("input.mp4", await fetchFile(video));
+      await ffmpeg.writeFile(`input.${fileType}`, await fetchFile(video));
 
       const commandArgs = constructFFmpegCommand({
         speed: Number(speed.split("x")[0]),
         frameRate,
-        inputFile: "input.mp4",
+        inputFile: `input.${fileType}`,
         outputFile: "output.gif",
         startTime: startTime,
         duration: duration,
@@ -134,6 +135,7 @@ const GenerateGif = () => {
     getFrameRateForDuration,
     speed,
     toast,
+    fileType,
   ]);
 
   const showGifPreview = () => {
