@@ -1,5 +1,6 @@
 import { Upload } from "lucide-react"; // Replace with your icon import
 import { Button } from "./ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface VideoUploadProps {
   onVideoSelect: (file: File) => void;
@@ -10,9 +11,18 @@ const UploadVideo: React.FC<VideoUploadProps> = ({
   onVideoSelect,
   buttonText,
 }) => {
+  const { toast } = useToast();
   const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      const isVideo = file.type.startsWith("video/");
+      if (!isVideo) {
+        toast({
+          title: "Please Upload Video file",
+          description: "",
+        });
+        return;
+      }
       onVideoSelect(file);
     }
   };
