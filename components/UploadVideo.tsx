@@ -18,7 +18,7 @@ const UploadVideo: React.FC<VideoUploadProps> = ({
       const isVideo = file.type.startsWith("video/");
       if (!isVideo) {
         toast({
-          title: "Please Upload Video file",
+          title: "Upload Video File Only",
           description: "",
         });
         return;
