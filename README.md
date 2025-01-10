@@ -3,9 +3,7 @@
 
 Video to GIF Converter is a app which allows users to convert videos to gif for free.
 
-### [Web](https://video-to-gif-convertor.vercel.app//)
-
-![Web Preview](https://github.com/suyash5641/Video-To-Gif-Convertor/blob/main/recording-2025-01-10-193301_oQ2Fufsf.mp4)
+### [Web](https://video-to-gif-convertor.vercel.app/)
 
 
 ## Features
