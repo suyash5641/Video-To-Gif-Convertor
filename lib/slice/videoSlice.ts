@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { getVideoFrames } from "../utils";
 import { data } from "../navbardata";
+import { CloudinarySignature } from "@/app/action";
 
 interface FrameRateOption {
   rate: number;
@@ -108,22 +109,21 @@ export const extractFrames = createAsyncThunk<
   "video/extractFrames",
   async ({ signal, file }, { dispatch, getState, rejectWithValue }) => {
     try {
+      const { signature, timestamp } = await CloudinarySignature();
+      if (!signature || !timestamp) throw new Error("Some Error Occured");
       const formData = new FormData();
       formData.append("file", file);
       formData.append(
-        "upload_preset",
-        process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? ""
+        "api_key",
+        process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY as string
       );
-      formData.append("resource_type", "video");
-
+      formData.append("timestamp", timestamp.toString());
+      formData.append("signature", signature);
       const interval = setInterval(() => {
         const state = getState() as RootState;
-
         const currentProgress = state.video.progress;
-
         const updatedProgress =
           currentProgress < 90 ? currentProgress + 5 : currentProgress;
-
         dispatch(setVideoState({ progress: updatedProgress }));
 
         if (updatedProgress >= 90) {

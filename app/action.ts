@@ -1,42 +1,18 @@
 "use server";
-import { UploadApiResponse, v2 as cloudinary } from "cloudinary";
-type UploadResult =
-  | { success: UploadApiResponse; error?: never }
-  | { error: string; success?: never };
+import { v2 as cloudinary } from "cloudinary";
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
-});
-
-export async function UploadVideoCloudinary(formData: FormData) {
+export async function CloudinarySignature() {
   try {
-    const blob = formData.get("file") as Blob;
-    const arrayBuffer = await blob.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const timestamp = Math.round((Date.now() + 3 * 60 * 1000) / 1000);
+    const signature = cloudinary.utils.api_sign_request(
+      {
+        timestamp: timestamp,
+      },
+      process.env.CLOUDINARY_SECRET as string
+    );
 
-    return new Promise<UploadResult>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          resource_type: "video",
-          upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
-        },
-        (error, result) => {
-          if (error || !result) {
-            console.error("Upload failed:", error);
-            reject({ error: "Upload failed" });
-          } else {
-            console.log("Upload successful:", result);
-            resolve({ success: result });
-          }
-        }
-      );
-
-      uploadStream.end(buffer);
-    });
-  } catch (error) {
-    console.error("Error processing file:", error);
-    return { error: "Error processing file" };
+    return { signature, timestamp };
+  } catch {
+    return { signature: "", timestamp: 0 };
   }
 }
