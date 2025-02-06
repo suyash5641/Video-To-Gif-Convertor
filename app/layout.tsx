@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Analytics } from '@vercel/analytics/next';
 import { Toaster } from "@/components/ui/toaster";
 import { ReduxProvider } from "./ReduxProvider";
 import { AbortControllerProvider } from "@/components/AbortProvider";
@@ -36,6 +37,7 @@ export default function RootLayout({
           <AbortControllerProvider>
             <ReduxProvider>
               {children}
+              <Analytics />
               <Toaster />
             </ReduxProvider>
           </AbortControllerProvider>
